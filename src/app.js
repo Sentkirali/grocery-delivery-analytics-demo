@@ -1,10 +1,23 @@
 import { products } from "./products.js";
+import {
+  addToCart,
+  getCart,
+  calculateSubtotal,
+  calculateDeliveryFee,
+  calculateTotal,
+  getCartItemCount
+} from "./cart.js";
 
 const productGrid = document.querySelector("#product-grid");
 const searchInput = document.querySelector("#search-input");
 const categoryFilter = document.querySelector("#category-filter");
 const sortSelect = document.querySelector("#sort-select");
 const stockOnlyCheckbox = document.querySelector("#stock-only");
+const cartItemsContainer = document.querySelector("#cart-items");
+const cartCount = document.querySelector("#cart-count");
+const cartSubtotal = document.querySelector("#cart-subtotal");
+const deliveryFee = document.querySelector("#delivery-fee");
+const cartTotal = document.querySelector("#cart-total");
 
 console.log("App loaded");
 console.log("Products:", products);
@@ -60,6 +73,40 @@ function renderProducts(productList) {
   });
 }
 
+function renderCart() {
+  const cart = getCart();
+
+  cartItemsContainer.innerHTML = "";
+
+  if (cart.length === 0) {
+    cartItemsContainer.innerHTML = `
+      <p class="empty-state">Your cart is empty.</p>
+    `;
+  } else {
+    cart.forEach((item) => {
+      const cartItem = document.createElement("div");
+      cartItem.classList.add("cart-item");
+
+      cartItem.innerHTML = `
+        <div>
+          <h3>${item.name}</h3>
+          <p>${formatPrice(item.price)} / ${item.unit}</p>
+          <p>Quantity: ${item.quantity}</p>
+        </div>
+
+        <strong>${formatPrice(item.price * item.quantity)}</strong>
+      `;
+
+      cartItemsContainer.append(cartItem);
+    });
+  }
+
+  cartCount.textContent = `Cart: ${getCartItemCount()} items`;
+  cartSubtotal.textContent = formatPrice(calculateSubtotal());
+  deliveryFee.textContent = formatPrice(calculateDeliveryFee());
+  cartTotal.textContent = formatPrice(calculateTotal());
+}
+
 function getFilteredProducts() {
   const searchTerm = searchInput.value.toLowerCase().trim();
   const selectedCategory = categoryFilter.value;
@@ -104,5 +151,23 @@ searchInput.addEventListener("input", updateProductList);
 categoryFilter.addEventListener("change", updateProductList);
 sortSelect.addEventListener("change", updateProductList);
 stockOnlyCheckbox.addEventListener("change", updateProductList);
+
+productGrid.addEventListener("click", (event) => {
+  const addToCartButton = event.target.closest(".add-to-cart-btn");
+
+  if (!addToCartButton) {
+    return;
+  }
+
+  const productId = Number(addToCartButton.dataset.productId);
+  const selectedProduct = products.find((product) => product.id === productId);
+
+  if (!selectedProduct) {
+    return;
+  }
+
+  addToCart(selectedProduct);
+  renderCart();
+});
 
 renderProducts(products);

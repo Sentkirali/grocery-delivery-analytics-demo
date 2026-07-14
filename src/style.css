@@ -376,3 +376,23 @@ button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.cart-item h3 {
+  margin: 0 0 6px;
+}
+
+.cart-item p {
+  margin: 4px 0;
+  color: #64748b;
+}
