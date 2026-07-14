@@ -21,11 +21,13 @@ const cartCount = document.querySelector("#cart-count");
 const cartSubtotal = document.querySelector("#cart-subtotal");
 const deliveryFee = document.querySelector("#delivery-fee");
 const cartTotal = document.querySelector("#cart-total");
+const deliverySlotSelect = document.querySelector("#delivery-slot");
+const deliveryMessage = document.querySelector("#delivery-message");
 
+let selectedDeliverySlot = "";
 console.log("App loaded");
 console.log("Products:", products);
 console.log("Product grid:", productGrid);
-
 
 function formatPrice(price) {
   return `${price.toLocaleString("hu-HU")} HUF`;
@@ -205,6 +207,25 @@ cartItemsContainer.addEventListener("click", (event) => {
     removeFromCart(productId);
     renderCart();
   }
+});
+
+deliverySlotSelect.addEventListener("change", () => {
+  selectedDeliverySlot = deliverySlotSelect.value;
+
+  if (selectedDeliverySlot === "") {
+    deliveryMessage.textContent = "Please select a delivery slot.";
+    deliveryMessage.classList.remove("success");
+    deliveryMessage.classList.add("warning");
+
+    console.log("No delivery slot selected.");
+    return;
+  }
+
+  deliveryMessage.textContent = `Selected delivery slot: ${selectedDeliverySlot}`;
+  deliveryMessage.classList.remove("warning");
+  deliveryMessage.classList.add("success");
+
+  console.log("Selected delivery slot:", selectedDeliverySlot);
 });
 
 renderProducts(products);
