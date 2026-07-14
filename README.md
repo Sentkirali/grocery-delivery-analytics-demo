@@ -8,7 +8,7 @@ This project was built as part of my junior frontend developer portfolio.
 
 ## Live Demo
 
-Coming soon.
+https://sentkirali.github.io/grocery-delivery-analytics-demo/
 
 ## Features
 
