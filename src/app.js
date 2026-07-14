@@ -10,6 +10,7 @@ import {
   decreaseQuantity,
   removeFromCart
 } from "./cart.js";
+import { validateCheckoutForm } from "./checkoutValidation.js";
 
 const productGrid = document.querySelector("#product-grid");
 const searchInput = document.querySelector("#search-input");
@@ -23,6 +24,17 @@ const deliveryFee = document.querySelector("#delivery-fee");
 const cartTotal = document.querySelector("#cart-total");
 const deliverySlotSelect = document.querySelector("#delivery-slot");
 const deliveryMessage = document.querySelector("#delivery-message");
+const checkoutForm = document.querySelector("#checkout-form");
+const fullNameInput = document.querySelector("#full-name");
+const emailInput = document.querySelector("#email");
+const phoneInput = document.querySelector("#phone");
+const cityInput = document.querySelector("#city");
+const zipInput = document.querySelector("#zip");
+const addressInput = document.querySelector("#address");
+const deliveryInstructionsInput = document.querySelector("#delivery-instructions");
+const paymentMethodSelect = document.querySelector("#payment-method");
+const termsCheckbox = document.querySelector("#terms");
+const checkoutMessage = document.querySelector("#checkout-message");
 
 let selectedDeliverySlot = "";
 console.log("App loaded");
@@ -226,6 +238,42 @@ deliverySlotSelect.addEventListener("change", () => {
   deliveryMessage.classList.add("success");
 
   console.log("Selected delivery slot:", selectedDeliverySlot);
+});
+
+checkoutForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const formData = {
+    fullName: fullNameInput.value,
+    email: emailInput.value,
+    phone: phoneInput.value,
+    city: cityInput.value,
+    zip: zipInput.value,
+    address: addressInput.value,
+    deliveryInstructions: deliveryInstructionsInput.value,
+    paymentMethod: paymentMethodSelect.value,
+    termsAccepted: termsCheckbox.checked,
+    deliverySlot: selectedDeliverySlot,
+    cart: getCart()
+  };
+
+  const validationResult = validateCheckoutForm(formData);
+
+  if (!validationResult.isValid) {
+    checkoutMessage.textContent = validationResult.errors.join(" ");
+    checkoutMessage.classList.remove("success");
+    checkoutMessage.classList.add("error");
+
+    console.log("Checkout validation failed:", validationResult.errors);
+
+    return;
+  }
+
+  checkoutMessage.textContent = "Checkout validation successful. Ready to submit order.";
+  checkoutMessage.classList.remove("error");
+  checkoutMessage.classList.add("success");
+
+  console.log("Checkout form is valid:", formData);
 });
 
 renderProducts(products);
