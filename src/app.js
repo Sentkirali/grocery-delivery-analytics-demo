@@ -12,6 +12,13 @@ import {
   clearCart
 } from "./cart.js";
 import { validateCheckoutForm } from "./checkoutValidation.js";
+import {
+  trackEvent,
+  getDataLayer,
+  clearDataLayer,
+  getEventCount,
+  getLastEvent
+} from "./analytics.js";
 
 const productGrid = document.querySelector("#product-grid");
 const searchInput = document.querySelector("#search-input");
@@ -36,6 +43,12 @@ const deliveryInstructionsInput = document.querySelector("#delivery-instructions
 const paymentMethodSelect = document.querySelector("#payment-method");
 const termsCheckbox = document.querySelector("#terms");
 const checkoutMessage = document.querySelector("#checkout-message");
+const analyticsConsentCheckbox = document.querySelector("#analytics-consent");
+const consentStatus = document.querySelector("#consent-status");
+const eventCount = document.querySelector("#event-count");
+const lastEvent = document.querySelector("#last-event");
+const clearDataLayerButton = document.querySelector("#clear-datalayer-btn");
+const dataLayerOutput = document.querySelector("#datalayer-output");
 
 let selectedDeliverySlot = "";
 console.log("App loaded");
@@ -133,6 +146,41 @@ function renderCart() {
   cartTotal.textContent = formatPrice(calculateTotal());
 }
 
+function renderAnalyticsPanel(lastTrackingResult = null) {
+  consentStatus.textContent = analyticsConsentCheckbox.checked ? "granted" : "denied";
+  eventCount.textContent = getEventCount();
+
+  const latestEvent = getLastEvent();
+
+  if (lastTrackingResult?.status === "blocked") {
+    lastEvent.textContent = `blocked: ${lastTrackingResult.event.eventName}`;
+  } else {
+    lastEvent.textContent = latestEvent ? latestEvent.eventName : "none";
+  }
+
+  dataLayerOutput.textContent = JSON.stringify(getDataLayer(), null, 2);
+}
+
+function runTracking(eventName, properties = {}) {
+  const result = trackEvent(
+    eventName,
+    properties,
+    analyticsConsentCheckbox.checked
+  );
+
+  if (result.status === "blocked") {
+    console.warn(`Tracking blocked: ${eventName}`);
+  }
+
+  if (result.status === "invalid") {
+    console.error("Invalid tracking payload:", result.errors);
+  }
+
+  renderAnalyticsPanel(result);
+
+  return result;
+}
+
 function getFilteredProducts() {
   const searchTerm = searchInput.value.toLowerCase().trim();
   const selectedCategory = categoryFilter.value;
@@ -173,10 +221,37 @@ function updateProductList() {
   renderProducts(filteredProducts);
 }
 
-searchInput.addEventListener("input", updateProductList);
-categoryFilter.addEventListener("change", updateProductList);
-sortSelect.addEventListener("change", updateProductList);
-stockOnlyCheckbox.addEventListener("change", updateProductList);
+searchInput.addEventListener("input", () => {
+  updateProductList();
+
+  runTracking("product_searched", {
+    searchTerm: searchInput.value.trim()
+  });
+});
+
+categoryFilter.addEventListener("change", () => {
+  updateProductList();
+
+  runTracking("category_filtered", {
+    category: categoryFilter.value
+  });
+});
+
+sortSelect.addEventListener("change", () => {
+  updateProductList();
+
+  runTracking("sort_changed", {
+    sortValue: sortSelect.value
+  });
+});
+
+stockOnlyCheckbox.addEventListener("change", () => {
+  updateProductList();
+
+  runTracking("stock_filter_changed", {
+    inStockOnly: stockOnlyCheckbox.checked
+  });
+});
 
 productGrid.addEventListener("click", (event) => {
   const addToCartButton = event.target.closest(".add-to-cart-btn");
@@ -192,8 +267,17 @@ productGrid.addEventListener("click", (event) => {
     return;
   }
 
-  addToCart(selectedProduct);
-  renderCart();
+addToCart(selectedProduct);
+renderCart();
+
+runTracking("add_to_cart", {
+  productId: selectedProduct.id,
+  productName: selectedProduct.name,
+  category: selectedProduct.category,
+  price: selectedProduct.price,
+  unit: selectedProduct.unit,
+  quantity: 1
+});
 });
 
 cartItemsContainer.addEventListener("click", (event) => {
@@ -203,22 +287,38 @@ cartItemsContainer.addEventListener("click", (event) => {
 
   if (increaseButton) {
     const productId = Number(increaseButton.dataset.productId);
-    increaseQuantity(productId);
-    renderCart();
-    return;
+   increaseQuantity(productId);
+renderCart();
+
+runTracking("cart_quantity_changed", {
+  productId,
+  action: "increase"
+});
+
+return;
   }
 
   if (decreaseButton) {
     const productId = Number(decreaseButton.dataset.productId);
     decreaseQuantity(productId);
-    renderCart();
-    return;
+renderCart();
+
+runTracking("cart_quantity_changed", {
+  productId,
+  action: "decrease"
+});
+
+return;
   }
 
   if (removeButton) {
     const productId = Number(removeButton.dataset.productId);
     removeFromCart(productId);
-    renderCart();
+renderCart();
+
+runTracking("remove_from_cart", {
+  productId
+});
   }
 });
 
@@ -239,6 +339,9 @@ deliverySlotSelect.addEventListener("change", () => {
   deliveryMessage.classList.add("success");
 
   console.log("Selected delivery slot:", selectedDeliverySlot);
+  runTracking("delivery_slot_selected", {
+  deliverySlot: selectedDeliverySlot
+  });
 });
 
 checkoutForm.addEventListener("submit", (event) => {
@@ -292,6 +395,13 @@ checkoutMessage.classList.remove("error");
 checkoutMessage.classList.add("success");
 
 console.log("Order submitted:", order);
+runTracking("order_submitted", {
+  orderId: order.id,
+  orderTotal: order.total,
+  itemCount: order.items.reduce((total, item) => total + item.quantity, 0),
+  deliverySlot: order.deliverySlot,
+  paymentMethod: order.paymentMethod
+});
 
 clearCart();
 renderCart();
@@ -303,5 +413,19 @@ selectedDeliverySlot = "";
 deliveryMessage.textContent = "";
 });
 
+analyticsConsentCheckbox.addEventListener("change", () => {
+  renderAnalyticsPanel();
+});
+
+clearDataLayerButton.addEventListener("click", () => {
+  clearDataLayer();
+  renderAnalyticsPanel();
+});
+
 renderProducts(products);
 renderCart();
+renderAnalyticsPanel();
+
+runTracking("product_list_viewed", {
+  productCount: productData.length
+});
