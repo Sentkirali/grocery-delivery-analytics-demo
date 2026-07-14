@@ -1,4 +1,6 @@
-export let cart = [];
+import { saveCart, loadCart } from "./storage.js";
+
+export let cart = loadCart();
 
 export function addToCart(product) {
   const existingCartItem = cart.find((item) => item.id === product.id);
@@ -12,6 +14,7 @@ export function addToCart(product) {
     });
   }
 
+  saveCart(cart);
   return cart;
 }
 
@@ -52,6 +55,7 @@ export function increaseQuantity(productId) {
 
   cartItem.quantity += 1;
 
+  saveCart(cart);
   return cart;
 }
 
@@ -64,16 +68,19 @@ export function decreaseQuantity(productId) {
 
   if (cartItem.quantity === 1) {
     cart = cart.filter((item) => item.id !== productId);
+    saveCart(cart);
     return cart;
   }
 
   cartItem.quantity -= 1;
 
+  saveCart(cart);
   return cart;
 }
 
 export function removeFromCart(productId) {
   cart = cart.filter((item) => item.id !== productId);
 
+  saveCart(cart);
   return cart;
 }
