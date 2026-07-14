@@ -5,7 +5,10 @@ import {
   calculateSubtotal,
   calculateDeliveryFee,
   calculateTotal,
-  getCartItemCount
+  getCartItemCount,
+  increaseQuantity,
+  decreaseQuantity,
+  removeFromCart
 } from "./cart.js";
 
 const productGrid = document.querySelector("#product-grid");
@@ -88,14 +91,22 @@ function renderCart() {
       cartItem.classList.add("cart-item");
 
       cartItem.innerHTML = `
-        <div>
-          <h3>${item.name}</h3>
-          <p>${formatPrice(item.price)} / ${item.unit}</p>
-          <p>Quantity: ${item.quantity}</p>
-        </div>
+  <div>
+    <h3>${item.name}</h3>
+    <p>${formatPrice(item.price)} / ${item.unit}</p>
 
-        <strong>${formatPrice(item.price * item.quantity)}</strong>
-      `;
+    <div class="quantity-controls">
+      <button class="quantity-btn decrease-btn" data-product-id="${item.id}">-</button>
+      <span>${item.quantity}</span>
+      <button class="quantity-btn increase-btn" data-product-id="${item.id}">+</button>
+    </div>
+  </div>
+
+  <div class="cart-item-actions">
+    <strong>${formatPrice(item.price * item.quantity)}</strong>
+    <button class="remove-btn" data-product-id="${item.id}">Remove</button>
+  </div>
+`;
 
       cartItemsContainer.append(cartItem);
     });
@@ -170,4 +181,31 @@ productGrid.addEventListener("click", (event) => {
   renderCart();
 });
 
+cartItemsContainer.addEventListener("click", (event) => {
+  const increaseButton = event.target.closest(".increase-btn");
+  const decreaseButton = event.target.closest(".decrease-btn");
+  const removeButton = event.target.closest(".remove-btn");
+
+  if (increaseButton) {
+    const productId = Number(increaseButton.dataset.productId);
+    increaseQuantity(productId);
+    renderCart();
+    return;
+  }
+
+  if (decreaseButton) {
+    const productId = Number(decreaseButton.dataset.productId);
+    decreaseQuantity(productId);
+    renderCart();
+    return;
+  }
+
+  if (removeButton) {
+    const productId = Number(removeButton.dataset.productId);
+    removeFromCart(productId);
+    renderCart();
+  }
+});
+
 renderProducts(products);
+renderCart();

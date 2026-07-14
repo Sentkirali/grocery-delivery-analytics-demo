@@ -42,3 +42,38 @@ export function getCartItemCount() {
     return total + item.quantity;
   }, 0);
 }
+
+export function increaseQuantity(productId) {
+  const cartItem = cart.find((item) => item.id === productId);
+
+  if (!cartItem) {
+    return cart;
+  }
+
+  cartItem.quantity += 1;
+
+  return cart;
+}
+
+export function decreaseQuantity(productId) {
+  const cartItem = cart.find((item) => item.id === productId);
+
+  if (!cartItem) {
+    return cart;
+  }
+
+  if (cartItem.quantity === 1) {
+    cart = cart.filter((item) => item.id !== productId);
+    return cart;
+  }
+
+  cartItem.quantity -= 1;
+
+  return cart;
+}
+
+export function removeFromCart(productId) {
+  cart = cart.filter((item) => item.id !== productId);
+
+  return cart;
+}
