@@ -1,0 +1,1 @@
+console.log("Grocery Delivery Analytics Demo loaded.");

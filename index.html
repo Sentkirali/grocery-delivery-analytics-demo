@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Grocery Delivery Analytics Demo</title>
+
+    <link rel="stylesheet" href="./src/style.css" />
+    <script type="module" src="./src/app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-content">
+        <a href="#" class="logo">FreshCart Delivery</a>
+
+        <nav class="nav">
+          <a href="#products">Products</a>
+          <a href="#cart">Cart</a>
+          <a href="#delivery">Delivery</a>
+          <a href="#checkout">Checkout</a>
+        </nav>
+
+        <div class="header-actions">
+          <span id="cart-count" class="cart-count">Cart: 0 items</span>
+
+          <label class="consent-toggle">
+            <input id="analytics-consent" type="checkbox" checked />
+            Analytics consent
+          </label>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-content">
+          <p class="eyebrow">Frontend Portfolio Project</p>
+          <h1>Fresh groceries delivered to your door.</h1>
+          <p>
+            A vanilla JavaScript grocery delivery demo with cart logic,
+            localStorage, checkout validation, and analytics-style event
+            tracking.
+          </p>
+          <a href="#products" class="btn">Start shopping</a>
+        </div>
+      </section>
+
+      <section id="products" class="section">
+        <div class="container">
+          <div class="section-heading">
+            <p class="eyebrow">Products</p>
+            <h2>Shop groceries</h2>
+            <p>Search, filter, and add products to your delivery basket.</p>
+          </div>
+
+          <div class="toolbar">
+            <input
+              id="search-input"
+              type="text"
+              placeholder="Search groceries..."
+            />
+
+            <select id="category-filter">
+              <option value="all">All categories</option>
+              <option value="Fruits & Vegetables">Fruits & Vegetables</option>
+              <option value="Bakery">Bakery</option>
+              <option value="Dairy">Dairy</option>
+              <option value="Meat">Meat</option>
+              <option value="Drinks">Drinks</option>
+              <option value="Pantry">Pantry</option>
+              <option value="Frozen">Frozen</option>
+            </select>
+
+            <select id="sort-select">
+              <option value="default">Default sorting</option>
+              <option value="price-asc">Price low to high</option>
+              <option value="price-desc">Price high to low</option>
+            </select>
+
+            <label class="stock-filter">
+              <input id="stock-only" type="checkbox" />
+              In stock only
+            </label>
+          </div>
+
+          <div id="product-grid" class="product-grid">
+            <!-- Products will be rendered here by JavaScript -->
+          </div>
+        </div>
+      </section>
+
+      <section id="cart" class="section section-muted">
+        <div class="container two-column-layout">
+          <div class="card">
+            <div class="section-heading small">
+              <p class="eyebrow">Cart</p>
+              <h2>Your basket</h2>
+            </div>
+
+            <div id="cart-items" class="cart-items">
+              <p class="empty-state">Your cart is empty.</p>
+            </div>
+          </div>
+
+          <aside class="card cart-summary">
+            <h3>Order summary</h3>
+
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <strong id="cart-subtotal">0 HUF</strong>
+            </div>
+
+            <div class="summary-row">
+              <span>Delivery fee</span>
+              <strong id="delivery-fee">0 HUF</strong>
+            </div>
+
+            <div class="summary-row total">
+              <span>Total</span>
+              <strong id="cart-total">0 HUF</strong>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="delivery" class="section">
+        <div class="container">
+          <div class="card">
+            <div class="section-heading small">
+              <p class="eyebrow">Delivery</p>
+              <h2>Choose delivery slot</h2>
+            </div>
+
+            <label for="delivery-slot">Delivery time</label>
+            <select id="delivery-slot">
+              <option value="">Select a delivery slot</option>
+              <option value="Today 18:00-20:00">Today 18:00-20:00</option>
+              <option value="Tomorrow 10:00-12:00">Tomorrow 10:00-12:00</option>
+              <option value="Tomorrow 14:00-16:00">Tomorrow 14:00-16:00</option>
+              <option value="Tomorrow 18:00-20:00">Tomorrow 18:00-20:00</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section id="checkout" class="section section-muted">
+        <div class="container">
+          <div class="card">
+            <div class="section-heading small">
+              <p class="eyebrow">Checkout</p>
+              <h2>Delivery details</h2>
+            </div>
+
+            <form id="checkout-form" class="checkout-form">
+              <div class="form-grid">
+                <div>
+                  <label for="full-name">Full name</label>
+                  <input id="full-name" type="text" placeholder="John Smith" />
+                </div>
+
+                <div>
+                  <label for="email">Email</label>
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="john@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label for="phone">Phone number</label>
+                  <input id="phone" type="tel" placeholder="+36 30 123 4567" />
+                </div>
+
+                <div>
+                  <label for="city">City</label>
+                  <input id="city" type="text" placeholder="Budapest" />
+                </div>
+
+                <div>
+                  <label for="zip">ZIP code</label>
+                  <input id="zip" type="text" placeholder="1100" />
+                </div>
+
+                <div>
+                  <label for="payment-method">Payment method</label>
+                  <select id="payment-method">
+                    <option value="cash_on_delivery">Cash on delivery</option>
+                    <option value="card_on_delivery">Card on delivery</option>
+                  </select>
+                </div>
+              </div>
+
+              <label for="address">Street address</label>
+              <input id="address" type="text" placeholder="Main street 12" />
+
+              <label for="delivery-instructions">Delivery instructions</label>
+              <textarea
+                id="delivery-instructions"
+                placeholder="Optional delivery note"
+              ></textarea>
+
+              <label class="terms-row">
+                <input id="terms" type="checkbox" />
+                I accept the delivery terms.
+              </label>
+
+              <button class="btn" type="submit">Submit order</button>
+
+              <p id="checkout-message" class="form-message"></p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="analytics" class="section">
+        <div class="container">
+          <div class="card">
+            <div class="section-heading small">
+              <p class="eyebrow">Analytics</p>
+              <h2>Analytics Debug Panel</h2>
+            </div>
+
+            <div class="analytics-stats">
+              <p>Consent: <strong id="consent-status">granted</strong></p>
+              <p>Total events: <strong id="event-count">0</strong></p>
+              <p>Last event: <strong id="last-event">none</strong></p>
+            </div>
+
+            <button id="clear-datalayer-btn" class="btn secondary">
+              Clear dataLayer
+            </button>
+
+            <pre id="datalayer-output" class="code-box">[]</pre>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
