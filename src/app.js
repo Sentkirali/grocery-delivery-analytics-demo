@@ -1,10 +1,15 @@
 import { products } from "./products.js";
 
 const productGrid = document.querySelector("#product-grid");
+const searchInput = document.querySelector("#search-input");
+const categoryFilter = document.querySelector("#category-filter");
+const sortSelect = document.querySelector("#sort-select");
+const stockOnlyCheckbox = document.querySelector("#stock-only");
 
 console.log("App loaded");
 console.log("Products:", products);
 console.log("Product grid:", productGrid);
+
 
 function formatPrice(price) {
   return `${price.toLocaleString("hu-HU")} HUF`;
@@ -54,5 +59,50 @@ function renderProducts(productList) {
     productGrid.append(productCard);
   });
 }
+
+function getFilteredProducts() {
+  const searchTerm = searchInput.value.toLowerCase().trim();
+  const selectedCategory = categoryFilter.value;
+  const selectedSort = sortSelect.value;
+  const stockOnly = stockOnlyCheckbox.checked;
+
+  let filteredProducts = [...products];
+
+  if (searchTerm !== "") {
+    filteredProducts = filteredProducts.filter((product) =>
+      product.name.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  if (selectedCategory !== "all") {
+    filteredProducts = filteredProducts.filter(
+      (product) => product.category === selectedCategory
+    );
+  }
+
+  if (stockOnly) {
+    filteredProducts = filteredProducts.filter((product) => product.inStock);
+  }
+
+  if (selectedSort === "price-asc") {
+    filteredProducts.sort((a, b) => a.price - b.price);
+  }
+
+  if (selectedSort === "price-desc") {
+    filteredProducts.sort((a, b) => b.price - a.price);
+  }
+
+  return filteredProducts;
+}
+
+function updateProductList() {
+  const filteredProducts = getFilteredProducts();
+  renderProducts(filteredProducts);
+}
+
+searchInput.addEventListener("input", updateProductList);
+categoryFilter.addEventListener("change", updateProductList);
+sortSelect.addEventListener("change", updateProductList);
+stockOnlyCheckbox.addEventListener("change", updateProductList);
 
 renderProducts(products);
