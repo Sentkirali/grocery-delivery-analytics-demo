@@ -1,4 +1,4 @@
-import { saveCart, loadCart } from "./storage.js";
+import { saveCart, loadCart, clearSavedCart } from "./storage.js";
 
 export let cart = loadCart();
 
@@ -82,5 +82,12 @@ export function removeFromCart(productId) {
   cart = cart.filter((item) => item.id !== productId);
 
   saveCart(cart);
+  return cart;
+}
+
+export function clearCart() {
+  cart = [];
+  clearSavedCart();
+
   return cart;
 }

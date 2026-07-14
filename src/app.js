@@ -8,7 +8,8 @@ import {
   getCartItemCount,
   increaseQuantity,
   decreaseQuantity,
-  removeFromCart
+  removeFromCart,
+  clearCart
 } from "./cart.js";
 import { validateCheckoutForm } from "./checkoutValidation.js";
 
@@ -269,11 +270,37 @@ checkoutForm.addEventListener("submit", (event) => {
     return;
   }
 
-  checkoutMessage.textContent = "Checkout validation successful. Ready to submit order.";
-  checkoutMessage.classList.remove("error");
-  checkoutMessage.classList.add("success");
+  const order = {
+  id: `ORDER-${Date.now()}`,
+  customerName: formData.fullName,
+  email: formData.email,
+  phone: formData.phone,
+  address: formData.address,
+  city: formData.city,
+  zip: formData.zip,
+  deliverySlot: formData.deliverySlot,
+  paymentMethod: formData.paymentMethod,
+  items: getCart(),
+  subtotal: calculateSubtotal(),
+  deliveryFee: calculateDeliveryFee(),
+  total: calculateTotal(),
+  createdAt: new Date().toISOString()
+};
 
-  console.log("Checkout form is valid:", formData);
+checkoutMessage.textContent = `Order submitted successfully. Order total: ${formatPrice(order.total)}.`;
+checkoutMessage.classList.remove("error");
+checkoutMessage.classList.add("success");
+
+console.log("Order submitted:", order);
+
+clearCart();
+renderCart();
+
+checkoutForm.reset();
+deliverySlotSelect.value = "";
+selectedDeliverySlot = "";
+
+deliveryMessage.textContent = "";
 });
 
 renderProducts(products);
