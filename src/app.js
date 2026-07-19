@@ -1,3 +1,4 @@
+import { saveConsentState, loadConsentState } from "./storage.js";
 import { products } from "./products.js";
 import {
   addToCart,
@@ -477,6 +478,14 @@ function downloadDataLayerJson() {
   });
 }
 
+function initializeConsentState() {
+  const savedConsentState = loadConsentState();
+
+  analyticsConsentCheckbox.checked = savedConsentState;
+
+  renderAnalyticsPanel();
+}
+
 function renderAnalyticsPanel(lastTrackingResult = null) {
   consentStatus.textContent = analyticsConsentCheckbox.checked ? "granted" : "denied";
   eventCount.textContent = getEventCount();
@@ -856,6 +865,12 @@ deliveryMessage.textContent = "";
 });
 
 analyticsConsentCheckbox.addEventListener("change", () => {
+  saveConsentState(analyticsConsentCheckbox.checked);
+
+  runTracking("consent_state_changed", {
+    consentGranted: analyticsConsentCheckbox.checked
+  });
+
   renderAnalyticsPanel();
 });
 
@@ -867,7 +882,7 @@ clearDataLayerButton.addEventListener("click", () => {
 
 renderProducts(products);
 renderCart();
-renderAnalyticsPanel();
+initializeConsentState();
 
 runTracking("product_list_viewed", {
   productCount: products.length

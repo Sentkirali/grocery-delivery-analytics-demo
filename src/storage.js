@@ -22,3 +22,27 @@ export function loadCart() {
 export function clearSavedCart() {
   localStorage.removeItem(CART_STORAGE_KEY);
 }
+
+const CONSENT_STORAGE_KEY = "freshcart_analytics_consent";
+
+export function saveConsentState(isConsentGranted) {
+  localStorage.setItem(
+    CONSENT_STORAGE_KEY,
+    JSON.stringify(isConsentGranted)
+  );
+}
+
+export function loadConsentState() {
+  const savedConsentState = localStorage.getItem(CONSENT_STORAGE_KEY);
+
+  if (savedConsentState === null) {
+    return true;
+  }
+
+  try {
+    return JSON.parse(savedConsentState);
+  } catch (error) {
+    console.error("Failed to parse consent state from localStorage:", error);
+    return true;
+  }
+}
