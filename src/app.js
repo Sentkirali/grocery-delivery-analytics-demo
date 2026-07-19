@@ -75,9 +75,8 @@ function renderProducts(productList) {
 
     productCard.innerHTML = `
       <div class="product-image">
-        <span>${product.name.charAt(0)}</span>
+           <img src="${product.image}" alt="${product.name}" />
       </div>
-
       <div class="product-content">
         <p class="product-category">${product.category}</p>
         <h3>${product.name}</h3>
