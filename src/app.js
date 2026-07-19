@@ -51,6 +51,7 @@ const eventCount = document.querySelector("#event-count");
 const lastEvent = document.querySelector("#last-event");
 const blockedEventCount = document.querySelector("#blocked-event-count");
 const clearDataLayerButton = document.querySelector("#clear-datalayer-btn");
+const downloadDataLayerButton = document.querySelector("#download-datalayer-btn");
 const dataLayerOutput = document.querySelector("#datalayer-output");
 const analyticsFilter = document.querySelector("#analytics-filter");
 const productModal = document.querySelector("#product-modal");
@@ -440,6 +441,40 @@ function getFilteredDataLayer() {
   }
 
   return dataLayer.filter((event) => allowedEvents.includes(event.eventName));
+}
+
+function downloadDataLayerJson() {
+  const data = getDataLayer();
+
+  if (data.length === 0) {
+    runTracking("datalayer_export_failed", {
+      reason: "empty_datalayer"
+    });
+
+    alert("No analytics events to download.");
+    return;
+  }
+
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {
+    type: "application/json"
+  });
+
+  const downloadUrl = URL.createObjectURL(blob);
+
+  const downloadLink = document.createElement("a");
+  downloadLink.href = downloadUrl;
+  downloadLink.download = `freshcart-datalayer-${Date.now()}.json`;
+
+  document.body.append(downloadLink);
+  downloadLink.click();
+  downloadLink.remove();
+
+  URL.revokeObjectURL(downloadUrl);
+
+  runTracking("datalayer_exported", {
+    eventCount: data.length
+  });
 }
 
 function renderAnalyticsPanel(lastTrackingResult = null) {
@@ -876,3 +911,5 @@ applyCouponButton.addEventListener("click", () => {
 analyticsFilter.addEventListener("change", () => {
   renderAnalyticsPanel();
 });
+
+downloadDataLayerButton.addEventListener("click", downloadDataLayerJson);

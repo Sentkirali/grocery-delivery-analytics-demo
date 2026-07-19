@@ -654,3 +654,15 @@ button:disabled {
     min-width: 100%;
   }
 }
+
+.analytics-button-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 620px) {
+  .analytics-button-group {
+    flex-direction: column;
+  }
+}

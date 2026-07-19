@@ -273,10 +273,19 @@
       <option value="delivery">Delivery events</option>
       <option value="coupon">Coupon events</option>
       <option value="search">Search / filter events</option>
+      <option value="debug">Debug events</option>
     </select>
   </div>
 
-  <button id="clear-datalayer-btn" class="btn secondary">Clear dataLayer</button>
+  <div class="analytics-button-group">
+    <button id="download-datalayer-btn" class="btn" type="button">
+      Download JSON
+    </button>
+
+    <button id="clear-datalayer-btn" class="btn secondary" type="button">
+      Clear dataLayer
+    </button>
+  </div>
 </div>
 
 <pre id="datalayer-output" class="code-box">[]</pre>
