@@ -113,14 +113,30 @@
             </div>
 
             <div class="summary-row">
-              <span>Delivery fee</span>
-              <strong id="delivery-fee">0 HUF</strong>
-            </div>
+  <span>Delivery fee</span>
+  <strong id="delivery-fee">0 HUF</strong>
+</div>
 
-            <div class="summary-row total">
-              <span>Total</span>
-              <strong id="cart-total">0 HUF</strong>
-            </div>
+<div class="coupon-box">
+  <label for="coupon-code">Discount code</label>
+
+  <div class="coupon-row">
+    <input id="coupon-code" type="text" placeholder="FRESH10 or DELIVERY0" />
+    <button id="apply-coupon-btn" class="btn" type="button">Apply</button>
+  </div>
+
+  <p id="coupon-message" class="form-message"></p>
+</div>
+
+<div class="summary-row">
+  <span>Discount</span>
+  <strong id="discount-amount">0 HUF</strong>
+</div>
+
+<div class="summary-row total">
+  <span>Total</span>
+  <strong id="cart-total">0 HUF</strong>
+</div>
           </aside>
         </div>
       </section>

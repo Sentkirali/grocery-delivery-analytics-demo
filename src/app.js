@@ -59,9 +59,15 @@ const modalProductStock = document.querySelector("#modal-product-stock");
 const modalProductDescription = document.querySelector("#modal-product-description");
 const modalAddToCartButton = document.querySelector("#modal-add-to-cart-btn");
 const orderConfirmation = document.querySelector("#order-confirmation");
+const couponCodeInput = document.querySelector("#coupon-code");
+const applyCouponButton = document.querySelector("#apply-coupon-btn");
+const couponMessage = document.querySelector("#coupon-message");
+const discountAmount = document.querySelector("#discount-amount");
 
 let activeModalProduct = null;
 let selectedDeliverySlot = "";
+let appliedCoupon = null;
+
 console.log("App loaded");
 console.log("Products:", products);
 console.log("Product grid:", productGrid);
@@ -124,6 +130,104 @@ function renderProducts(productList) {
   });
 }
 
+function getDiscountAmount() {
+  if (!appliedCoupon) {
+    return 0;
+  }
+
+  const subtotal = calculateSubtotal();
+  const delivery = calculateDeliveryFee();
+
+  if (appliedCoupon.code === "FRESH10") {
+    return Math.round(subtotal * 0.1);
+  }
+
+  if (appliedCoupon.code === "DELIVERY0") {
+    return delivery;
+  }
+
+  return 0;
+}
+
+function getFinalTotal() {
+  const totalBeforeDiscount = calculateSubtotal() + calculateDeliveryFee();
+  const discount = getDiscountAmount();
+
+  return Math.max(totalBeforeDiscount - discount, 0);
+}
+
+function applyCoupon(code) {
+  const normalizedCode = code.trim().toUpperCase();
+
+  if (getCart().length === 0) {
+    appliedCoupon = null;
+
+    couponMessage.textContent = "Add products to the cart before applying a coupon.";
+    couponMessage.classList.remove("success");
+    couponMessage.classList.add("error");
+
+    runTracking("coupon_failed", {
+      couponCode: normalizedCode || "empty",
+      reason: "cart_empty"
+    });
+
+    renderCart();
+    return;
+  }
+
+  if (normalizedCode === "FRESH10") {
+    appliedCoupon = {
+      code: "FRESH10",
+      label: "10% discount"
+    };
+
+    couponMessage.textContent = "Coupon applied: 10% discount.";
+    couponMessage.classList.remove("error");
+    couponMessage.classList.add("success");
+
+    runTracking("coupon_applied", {
+      couponCode: "FRESH10",
+      discountType: "percentage",
+      discountValue: 10
+    });
+
+    renderCart();
+    return;
+  }
+
+  if (normalizedCode === "DELIVERY0") {
+    appliedCoupon = {
+      code: "DELIVERY0",
+      label: "Free delivery"
+    };
+
+    couponMessage.textContent = "Coupon applied: free delivery.";
+    couponMessage.classList.remove("error");
+    couponMessage.classList.add("success");
+
+    runTracking("coupon_applied", {
+      couponCode: "DELIVERY0",
+      discountType: "free_delivery"
+    });
+
+    renderCart();
+    return;
+  }
+
+  appliedCoupon = null;
+
+  couponMessage.textContent = "Invalid coupon code.";
+  couponMessage.classList.remove("success");
+  couponMessage.classList.add("error");
+
+  runTracking("coupon_failed", {
+    couponCode: normalizedCode || "empty",
+    reason: "invalid_code"
+  });
+
+  renderCart();
+}
+
 function renderCart() {
   const cart = getCart();
 
@@ -160,10 +264,11 @@ function renderCart() {
     });
   }
 
-  cartCount.textContent = `Cart: ${getCartItemCount()} items`;
-  cartSubtotal.textContent = formatPrice(calculateSubtotal());
-  deliveryFee.textContent = formatPrice(calculateDeliveryFee());
-  cartTotal.textContent = formatPrice(calculateTotal());
+cartCount.textContent = `Cart: ${getCartItemCount()} items`;
+cartSubtotal.textContent = formatPrice(calculateSubtotal());
+deliveryFee.textContent = formatPrice(calculateDeliveryFee());
+discountAmount.textContent = `- ${formatPrice(getDiscountAmount())}`;
+cartTotal.textContent = formatPrice(getFinalTotal());
 }
 
 function getOrderItemCount(items) {
@@ -498,20 +603,22 @@ checkoutForm.addEventListener("submit", (event) => {
 }
 
   const order = {
-  id: `ORDER-${Date.now()}`,
-  customerName: formData.fullName,
-  email: formData.email,
-  phone: formData.phone,
-  address: formData.address,
-  city: formData.city,
-  zip: formData.zip,
-  deliverySlot: formData.deliverySlot,
-  paymentMethod: formData.paymentMethod,
-  items: getCart(),
-  subtotal: calculateSubtotal(),
-  deliveryFee: calculateDeliveryFee(),
-  total: calculateTotal(),
-  createdAt: new Date().toISOString()
+    id: `ORDER-${Date.now()}`,
+    customerName: formData.fullName,
+    email: formData.email,
+    phone: formData.phone,
+    address: formData.address,
+    city: formData.city,
+    zip: formData.zip,
+    deliverySlot: formData.deliverySlot,
+    paymentMethod: formData.paymentMethod,
+    items: getCart(),
+    subtotal: calculateSubtotal(),
+    deliveryFee: calculateDeliveryFee(),
+    discountCode: appliedCoupon ? appliedCoupon.code : null,
+    discountAmount: getDiscountAmount(),
+    total: getFinalTotal(),
+    createdAt: new Date().toISOString()
 };
 
 checkoutMessage.textContent = `Order submitted successfully. Order total: ${formatPrice(order.total)}.`;
@@ -527,10 +634,17 @@ runTracking("order_submitted", {
   orderTotal: order.total,
   itemCount: order.items.reduce((total, item) => total + item.quantity, 0),
   deliverySlot: order.deliverySlot,
-  paymentMethod: order.paymentMethod
+  paymentMethod: order.paymentMethod,
+  discountCode: order.discountCode,
+  discountAmount: order.discountAmount
 });
 
 clearCart();
+
+appliedCoupon = null;
+couponCodeInput.value = "";
+couponMessage.textContent = "";
+
 renderCart();
 
 checkoutForm.reset();
@@ -586,4 +700,8 @@ modalAddToCartButton.addEventListener("click", () => {
   });
 
   closeProductModal();
+});
+
+applyCouponButton.addEventListener("click", () => {
+  applyCoupon(couponCodeInput.value);
 });
