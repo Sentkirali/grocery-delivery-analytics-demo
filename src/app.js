@@ -83,9 +83,6 @@ let activeModalProduct = null;
 let selectedDeliverySlot = "";
 let appliedCoupon = null;
 
-console.log("App loaded");
-console.log("Products:", products);
-console.log("Product grid:", productGrid);
 
 function formatPrice(price) {
   return `${price.toLocaleString("hu-HU")} HUF`;
@@ -597,15 +594,11 @@ productGrid.addEventListener("click", (event) => {
   const addToCartButton = event.target.closest(".add-to-cart-btn");
   const viewDetailsButton = event.target.closest(".view-details-btn");
 
-  console.log("Product grid clicked");
-  console.log("Add button:", addToCartButton);
-  console.log("Details button:", viewDetailsButton);
+
 
   if (viewDetailsButton) {
     const productId = Number(viewDetailsButton.dataset.productId);
     const selectedProduct = products.find((product) => product.id === productId);
-
-    console.log("Selected product for modal:", selectedProduct);
 
     if (!selectedProduct) {
       return;
@@ -689,7 +682,6 @@ deliverySlotSelect.addEventListener("change", () => {
     deliveryMessage.classList.remove("success");
     deliveryMessage.classList.add("warning");
 
-    console.log("No delivery slot selected.");
     return;
   }
 
@@ -697,7 +689,6 @@ deliverySlotSelect.addEventListener("change", () => {
   deliveryMessage.classList.remove("warning");
   deliveryMessage.classList.add("success");
 
-  console.log("Selected delivery slot:", selectedDeliverySlot);
   runTracking("delivery_slot_selected", {
   deliverySlot: selectedDeliverySlot
   });
@@ -799,8 +790,6 @@ if (!validationResult.isValid) {
   orderConfirmation.classList.add("hidden");
   orderConfirmation.innerHTML = "";
 
-  console.log("Checkout validation failed:", validationResult.errors);
-
   runTracking("checkout_validation_failed", {
     errors: validationResult.errors,
     subtotal: calculateSubtotal(),
@@ -834,8 +823,6 @@ if (!validationResult.isValid) {
 checkoutMessage.textContent = `Order submitted successfully. Order total: ${formatPrice(order.total)}.`;
 checkoutMessage.classList.remove("error");
 checkoutMessage.classList.add("success");
-
-console.log("Order submitted:", order);
 
 renderOrderConfirmation(order);
 
