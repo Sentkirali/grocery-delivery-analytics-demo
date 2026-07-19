@@ -427,5 +427,5 @@ renderCart();
 renderAnalyticsPanel();
 
 runTracking("product_list_viewed", {
-  productCount: productData.length
+  productCount: products.length
 });

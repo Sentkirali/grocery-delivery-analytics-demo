@@ -5,7 +5,8 @@ export const products = [
     category: "Fruits & Vegetables",
     price: 699,
     unit: "kg",
-    inStock: true
+    inStock: true,
+    image: "./images/banana.jpg"
   },
   {
     id: 2,
@@ -13,7 +14,8 @@ export const products = [
     category: "Fruits & Vegetables",
     price: 899,
     unit: "kg",
-    inStock: true
+    inStock: true,
+    image: "./images/apple.jpg"
   },
   {
     id: 3,
@@ -21,7 +23,8 @@ export const products = [
     category: "Fruits & Vegetables",
     price: 1290,
     unit: "kg",
-    inStock: true
+    inStock: true,
+    image: "./images/tomato.jpg"
   },
   {
     id: 4,
@@ -29,7 +32,8 @@ export const products = [
     category: "Bakery",
     price: 799,
     unit: "piece",
-    inStock: true
+    inStock: true,
+    image: "./images/bread.jpg"
   },
   {
     id: 5,
@@ -37,7 +41,8 @@ export const products = [
     category: "Bakery",
     price: 499,
     unit: "piece",
-    inStock: false
+    inStock: false,
+    image: "./images/croissant.jpg"
   },
   {
     id: 6,
@@ -45,7 +50,8 @@ export const products = [
     category: "Dairy",
     price: 449,
     unit: "piece",
-    inStock: true
+    inStock: true,
+    image: "./images/milk.jpg"
   },
   {
     id: 7,
@@ -53,7 +59,8 @@ export const products = [
     category: "Dairy",
     price: 799,
     unit: "piece",
-    inStock: true
+    inStock: true,
+    image: "./images/yogurt.jpg"
   },
   {
     id: 8,
@@ -61,7 +68,8 @@ export const products = [
     category: "Meat",
     price: 2490,
     unit: "kg",
-    inStock: true
+    inStock: true,
+    image: "./images/chicken.jpg" 
   },
   {
     id: 9,
@@ -69,7 +77,8 @@ export const products = [
     category: "Drinks",
     price: 199,
     unit: "piece",
-    inStock: true
+    inStock: true,
+    image: "./images/water.jpg"
   },
   {
     id: 10,
@@ -77,7 +86,8 @@ export const products = [
     category: "Drinks",
     price: 899,
     unit: "piece",
-    inStock: true
+    inStock: true,
+    image: "./images/orange-juice.jpg"
   },
   {
     id: 11,
@@ -85,7 +95,8 @@ export const products = [
     category: "Pantry",
     price: 999,
     unit: "piece",
-    inStock: true
+    inStock: true,
+    image: "./images/rice.jpg"
   },
   {
     id: 12,
@@ -93,6 +104,7 @@ export const products = [
     category: "Frozen",
     price: 1590,
     unit: "piece",
-    inStock: false
+    inStock: false,
+    image: "./images/frozen-pizza.jpg"
   }
 ];
