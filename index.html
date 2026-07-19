@@ -181,6 +181,7 @@
                 <div>
                   <label for="full-name">Full name</label>
                   <input id="full-name" type="text" placeholder="John Smith" />
+                  <p id="full-name-error" class="field-error"></p>
                 </div>
 
                 <div>
@@ -190,21 +191,25 @@
                     type="email"
                     placeholder="john@example.com"
                   />
+                  <p id="email-error" class="field-error"></p>
                 </div>
 
                 <div>
                   <label for="phone">Phone number</label>
                   <input id="phone" type="tel" placeholder="+36 30 123 4567" />
+                  <p id="phone-error" class="field-error"></p>
                 </div>
 
                 <div>
                   <label for="city">City</label>
                   <input id="city" type="text" placeholder="Budapest" />
+                  <p id="city-error" class="field-error"></p>
                 </div>
 
                 <div>
                   <label for="zip">ZIP code</label>
                   <input id="zip" type="text" placeholder="1100" />
+                  <p id="zip-error" class="field-error"></p>
                 </div>
 
                 <div>
@@ -218,6 +223,7 @@
 
               <label for="address">Street address</label>
               <input id="address" type="text" placeholder="Main street 12" />
+              <p id="address-error" class="field-error"></p>
 
               <label for="delivery-instructions">Delivery instructions</label>
               <textarea
@@ -229,6 +235,8 @@
                 <input id="terms" type="checkbox" />
                 I accept the delivery terms.
               </label>
+
+              <p id="terms-error" class="field-error"></p>
 
               <button class="btn" type="submit">Submit order</button>
 

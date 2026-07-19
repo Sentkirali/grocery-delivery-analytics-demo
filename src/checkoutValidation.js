@@ -1,52 +1,62 @@
 export function validateCheckoutForm(formData) {
   const errors = [];
+  const fieldErrors = {};
+
+  function addError(field, message) {
+    errors.push(message);
+
+    if (!fieldErrors[field]) {
+      fieldErrors[field] = message;
+    }
+  }
 
   if (formData.cart.length === 0) {
-    errors.push("Your cart is empty.");
+    addError("cart", "Your cart is empty.");
   }
 
   if (formData.cart.length > 0 && formData.subtotal < 5000) {
-  errors.push("Minimum order value is 5 000 HUF.");
-  } 
+    addError("cart", "Minimum order value is 5 000 HUF.");
+  }
 
   if (formData.deliverySlot === "") {
-    errors.push("Please select a delivery slot.");
+    addError("deliverySlot", "Please select a delivery slot.");
   }
 
   if (formData.fullName.trim() === "") {
-    errors.push("Full name is required.");
+    addError("fullName", "Full name is required.");
   }
 
   if (formData.email.trim() === "") {
-    errors.push("Email is required.");
-  }
-
-  if (formData.email.trim() !== "" && !formData.email.includes("@")) {
-    errors.push("Email must contain @.");
+    addError("email", "Email is required.");
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+    addError("email", "Please enter a valid email address.");
   }
 
   if (formData.phone.trim() === "") {
-    errors.push("Phone number is required.");
+    addError("phone", "Phone number is required.");
+  } else if (formData.phone.trim().length < 7) {
+    addError("phone", "Phone number is too short.");
   }
 
   if (formData.city.trim() === "") {
-    errors.push("City is required.");
+    addError("city", "City is required.");
   }
 
   if (formData.zip.trim().length < 4) {
-    errors.push("ZIP code must be at least 4 characters long.");
+    addError("zip", "ZIP code must be at least 4 characters long.");
   }
 
   if (formData.address.trim().length < 5) {
-    errors.push("Street address must be at least 5 characters long.");
+    addError("address", "Street address must be at least 5 characters long.");
   }
 
   if (!formData.termsAccepted) {
-    errors.push("You must accept the delivery terms.");
+    addError("terms", "You must accept the delivery terms.");
   }
 
   return {
     isValid: errors.length === 0,
-    errors
+    errors,
+    fieldErrors
   };
 }

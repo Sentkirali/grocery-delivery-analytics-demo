@@ -64,6 +64,14 @@ const applyCouponButton = document.querySelector("#apply-coupon-btn");
 const couponMessage = document.querySelector("#coupon-message");
 const discountAmount = document.querySelector("#discount-amount");
 const minimumOrderStatus = document.querySelector("#minimum-order-status");
+const fullNameError = document.querySelector("#full-name-error");
+const emailError = document.querySelector("#email-error");
+const phoneError = document.querySelector("#phone-error");
+const cityError = document.querySelector("#city-error");
+const zipError = document.querySelector("#zip-error");
+const addressError = document.querySelector("#address-error");
+const termsError = document.querySelector("#terms-error");
+
 
 let activeModalProduct = null;
 let selectedDeliverySlot = "";
@@ -602,6 +610,72 @@ deliverySlotSelect.addEventListener("change", () => {
   });
 });
 
+function clearCheckoutFieldErrors() {
+  const fields = [
+    fullNameInput,
+    emailInput,
+    phoneInput,
+    cityInput,
+    zipInput,
+    addressInput
+  ];
+
+  const errorElements = [
+    fullNameError,
+    emailError,
+    phoneError,
+    cityError,
+    zipError,
+    addressError,
+    termsError
+  ];
+
+  fields.forEach((field) => {
+    field.classList.remove("input-error");
+    field.classList.remove("input-success");
+  });
+
+  errorElements.forEach((errorElement) => {
+    errorElement.textContent = "";
+  });
+}
+
+function showFieldError(inputElement, errorElement, message) {
+  if (!message) {
+    inputElement.classList.remove("input-error");
+    inputElement.classList.add("input-success");
+    errorElement.textContent = "";
+    return;
+  }
+
+  inputElement.classList.remove("input-success");
+  inputElement.classList.add("input-error");
+  errorElement.textContent = message;
+}
+
+function renderCheckoutFieldErrors(fieldErrors) {
+  clearCheckoutFieldErrors();
+
+  showFieldError(fullNameInput, fullNameError, fieldErrors.fullName);
+  showFieldError(emailInput, emailError, fieldErrors.email);
+  showFieldError(phoneInput, phoneError, fieldErrors.phone);
+  showFieldError(cityInput, cityError, fieldErrors.city);
+  showFieldError(zipInput, zipError, fieldErrors.zip);
+  showFieldError(addressInput, addressError, fieldErrors.address);
+
+  termsError.textContent = fieldErrors.terms || "";
+
+  if (fieldErrors.terms) {
+    termsError.classList.add("error");
+  }
+
+  if (fieldErrors.deliverySlot) {
+    deliveryMessage.textContent = fieldErrors.deliverySlot;
+    deliveryMessage.classList.remove("success");
+    deliveryMessage.classList.add("error");
+  }
+}
+
 checkoutForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -622,8 +696,10 @@ checkoutForm.addEventListener("submit", (event) => {
 
   const validationResult = validateCheckoutForm(formData);
 
-  if (!validationResult.isValid) {
-  checkoutMessage.textContent = validationResult.errors.join(" ");
+if (!validationResult.isValid) {
+  renderCheckoutFieldErrors(validationResult.fieldErrors);
+
+  checkoutMessage.textContent = "Please fix the highlighted fields.";
   checkoutMessage.classList.remove("success");
   checkoutMessage.classList.add("error");
 
@@ -631,14 +707,17 @@ checkoutForm.addEventListener("submit", (event) => {
   orderConfirmation.innerHTML = "";
 
   console.log("Checkout validation failed:", validationResult.errors);
+
   runTracking("checkout_validation_failed", {
-  errors: validationResult.errors,
-  subtotal: calculateSubtotal(),
-  minimumOrderValue: MINIMUM_ORDER_VALUE
-});
+    errors: validationResult.errors,
+    subtotal: calculateSubtotal(),
+    minimumOrderValue: MINIMUM_ORDER_VALUE
+  });
 
   return;
 }
+
+  clearCheckoutFieldErrors();
 
   const order = {
     id: `ORDER-${Date.now()}`,

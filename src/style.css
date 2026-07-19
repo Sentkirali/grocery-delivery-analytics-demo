@@ -608,3 +608,20 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 }
+
+.field-error {
+  min-height: 18px;
+  margin: 4px 0 0;
+  color: #b91c1c;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.input-error {
+  border-color: #b91c1c;
+  background: #fef2f2;
+}
+
+.input-success {
+  border-color: #16a34a;
+}
