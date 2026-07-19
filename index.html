@@ -261,9 +261,24 @@
               <p>Last event: <strong id="last-event">none</strong></p>
             </div>
 
-            <button id="clear-datalayer-btn" class="btn secondary">
-              Clear dataLayer
-            </button>
+            <div class="analytics-controls">
+  <div>
+    <label for="analytics-filter">Filter events</label>
+    <select id="analytics-filter">
+      <option value="all">All events</option>
+      <option value="product">Product events</option>
+      <option value="cart">Cart events</option>
+      <option value="checkout">Checkout events</option>
+      <option value="delivery">Delivery events</option>
+      <option value="coupon">Coupon events</option>
+      <option value="search">Search / filter events</option>
+    </select>
+  </div>
+
+  <button id="clear-datalayer-btn" class="btn secondary">Clear dataLayer</button>
+</div>
+
+<pre id="datalayer-output" class="code-box">[]</pre>
 
             <pre id="datalayer-output" class="code-box">[]</pre>
           </div>

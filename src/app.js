@@ -49,6 +49,7 @@ const eventCount = document.querySelector("#event-count");
 const lastEvent = document.querySelector("#last-event");
 const clearDataLayerButton = document.querySelector("#clear-datalayer-btn");
 const dataLayerOutput = document.querySelector("#datalayer-output");
+const analyticsFilter = document.querySelector("#analytics-filter");
 const productModal = document.querySelector("#product-modal");
 const modalCloseButton = document.querySelector("#modal-close-btn");
 const modalProductImage = document.querySelector("#modal-product-image");
@@ -392,6 +393,51 @@ function closeProductModal() {
   activeModalProduct = null;
 }
 
+function getFilteredDataLayer() {
+  const selectedFilter = analyticsFilter.value;
+  const dataLayer = getDataLayer();
+
+  if (selectedFilter === "all") {
+    return dataLayer;
+  }
+
+  const eventGroups = {
+    product: [
+      "product_list_viewed",
+      "product_detail_viewed"
+    ],
+    cart: [
+      "add_to_cart",
+      "remove_from_cart",
+      "cart_quantity_changed"
+    ],
+    checkout: [
+      "checkout_validation_failed",
+      "order_submitted"
+    ],
+    delivery: [
+      "delivery_slot_selected"
+    ],
+    coupon: [
+      "coupon_applied",
+      "coupon_failed"
+    ],
+    search: [
+      "product_searched",
+      "category_filtered",
+      "sort_changed",
+      "stock_filter_changed"
+    ]
+  };
+
+  const allowedEvents = eventGroups[selectedFilter];
+
+  if (!allowedEvents) {
+    return dataLayer;
+  }
+
+  return dataLayer.filter((event) => allowedEvents.includes(event.eventName));
+}
 
 function renderAnalyticsPanel(lastTrackingResult = null) {
   consentStatus.textContent = analyticsConsentCheckbox.checked ? "granted" : "denied";
@@ -405,8 +451,7 @@ function renderAnalyticsPanel(lastTrackingResult = null) {
     lastEvent.textContent = latestEvent ? latestEvent.eventName : "none";
   }
 
-  dataLayerOutput.textContent = JSON.stringify(getDataLayer(), null, 2);
-}
+dataLayerOutput.textContent = JSON.stringify(getFilteredDataLayer(), null, 2);}
 
 function runTracking(eventName, properties = {}) {
   const result = trackEvent(
@@ -821,4 +866,8 @@ modalAddToCartButton.addEventListener("click", () => {
 
 applyCouponButton.addEventListener("click", () => {
   applyCoupon(couponCodeInput.value);
+});
+
+analyticsFilter.addEventListener("change", () => {
+  renderAnalyticsPanel();
 });
