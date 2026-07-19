@@ -1,5 +1,7 @@
 export const dataLayer = [];
 
+let blockedEventCount = 0;
+
 export function validateEventPayload(payload) {
   const errors = [];
 
@@ -54,13 +56,16 @@ export function trackEvent(eventName, properties = {}, consentGranted = true) {
   }
 
   if (!consentGranted) {
-    return {
-      status: "blocked",
-      event: eventPayload,
-      errors: ["Consent not granted."],
-      dataLayer
-    };
-  }
+  blockedEventCount += 1;
+
+  return {
+    status: "blocked",
+    event: eventPayload,
+    errors: ["Consent not granted."],
+    dataLayer,
+    blockedEventCount
+  };
+}
 
   dataLayer.push(eventPayload);
 
@@ -91,4 +96,13 @@ export function getLastEvent() {
   }
 
   return dataLayer[dataLayer.length - 1];
+}
+
+export function getBlockedEventCount() {
+  return blockedEventCount;
+}
+
+export function resetBlockedEventCount() {
+  blockedEventCount = 0;
+  return blockedEventCount;
 }

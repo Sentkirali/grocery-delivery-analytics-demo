@@ -17,7 +17,9 @@ import {
   getDataLayer,
   clearDataLayer,
   getEventCount,
-  getLastEvent
+  getLastEvent,
+  getBlockedEventCount,
+  resetBlockedEventCount
 } from "./analytics.js";
 
 const productGrid = document.querySelector("#product-grid");
@@ -47,6 +49,7 @@ const analyticsConsentCheckbox = document.querySelector("#analytics-consent");
 const consentStatus = document.querySelector("#consent-status");
 const eventCount = document.querySelector("#event-count");
 const lastEvent = document.querySelector("#last-event");
+const blockedEventCount = document.querySelector("#blocked-event-count");
 const clearDataLayerButton = document.querySelector("#clear-datalayer-btn");
 const dataLayerOutput = document.querySelector("#datalayer-output");
 const analyticsFilter = document.querySelector("#analytics-filter");
@@ -442,6 +445,7 @@ function getFilteredDataLayer() {
 function renderAnalyticsPanel(lastTrackingResult = null) {
   consentStatus.textContent = analyticsConsentCheckbox.checked ? "granted" : "denied";
   eventCount.textContent = getEventCount();
+  blockedEventCount.textContent = getBlockedEventCount();
 
   const latestEvent = getLastEvent();
 
@@ -822,6 +826,7 @@ analyticsConsentCheckbox.addEventListener("change", () => {
 
 clearDataLayerButton.addEventListener("click", () => {
   clearDataLayer();
+  resetBlockedEventCount();
   renderAnalyticsPanel();
 });
 
