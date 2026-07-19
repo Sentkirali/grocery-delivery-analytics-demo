@@ -5,6 +5,10 @@ export function validateCheckoutForm(formData) {
     errors.push("Your cart is empty.");
   }
 
+  if (formData.cart.length > 0 && formData.subtotal < 5000) {
+  errors.push("Minimum order value is 5 000 HUF.");
+  } 
+
   if (formData.deliverySlot === "") {
     errors.push("Please select a delivery slot.");
   }

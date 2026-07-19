@@ -29,8 +29,18 @@ export function calculateSubtotal() {
 }
 
 export function calculateDeliveryFee() {
+  const subtotal = calculateSubtotal();
+
   if (cart.length === 0) {
     return 0;
+  }
+
+  if (subtotal >= 15000) {
+    return 0;
+  }
+
+  if (subtotal >= 10000) {
+    return 990;
   }
 
   return 1490;

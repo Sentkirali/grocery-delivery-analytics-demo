@@ -63,6 +63,7 @@ const couponCodeInput = document.querySelector("#coupon-code");
 const applyCouponButton = document.querySelector("#apply-coupon-btn");
 const couponMessage = document.querySelector("#coupon-message");
 const discountAmount = document.querySelector("#discount-amount");
+const minimumOrderStatus = document.querySelector("#minimum-order-status");
 
 let activeModalProduct = null;
 let selectedDeliverySlot = "";
@@ -128,6 +129,22 @@ function renderProducts(productList) {
 
     productGrid.append(productCard);
   });
+}
+
+const MINIMUM_ORDER_VALUE = 5000;
+
+function getRemainingMinimumOrderAmount() {
+  const subtotal = calculateSubtotal();
+
+  if (subtotal >= MINIMUM_ORDER_VALUE) {
+    return 0;
+  }
+
+  return MINIMUM_ORDER_VALUE - subtotal;
+}
+
+function isMinimumOrderReached() {
+  return calculateSubtotal() >= MINIMUM_ORDER_VALUE;
 }
 
 function getDiscountAmount() {
@@ -266,6 +283,21 @@ function renderCart() {
 
 cartCount.textContent = `Cart: ${getCartItemCount()} items`;
 cartSubtotal.textContent = formatPrice(calculateSubtotal());
+
+if (getCart().length === 0) {
+  minimumOrderStatus.textContent = `${formatPrice(MINIMUM_ORDER_VALUE)} required`;
+  minimumOrderStatus.classList.remove("success");
+  minimumOrderStatus.classList.add("warning");
+} else if (!isMinimumOrderReached()) {
+  minimumOrderStatus.textContent = `${formatPrice(getRemainingMinimumOrderAmount())} more needed`;
+  minimumOrderStatus.classList.remove("success");
+  minimumOrderStatus.classList.add("warning");
+} else {
+  minimumOrderStatus.textContent = "Minimum reached";
+  minimumOrderStatus.classList.remove("warning");
+  minimumOrderStatus.classList.add("success");
+}
+
 deliveryFee.textContent = formatPrice(calculateDeliveryFee());
 discountAmount.textContent = `- ${formatPrice(getDiscountAmount())}`;
 cartTotal.textContent = formatPrice(getFinalTotal());
@@ -584,7 +616,8 @@ checkoutForm.addEventListener("submit", (event) => {
     paymentMethod: paymentMethodSelect.value,
     termsAccepted: termsCheckbox.checked,
     deliverySlot: selectedDeliverySlot,
-    cart: getCart()
+    cart: getCart(),
+    subtotal: calculateSubtotal(),
   };
 
   const validationResult = validateCheckoutForm(formData);
@@ -598,6 +631,11 @@ checkoutForm.addEventListener("submit", (event) => {
   orderConfirmation.innerHTML = "";
 
   console.log("Checkout validation failed:", validationResult.errors);
+  runTracking("checkout_validation_failed", {
+  errors: validationResult.errors,
+  subtotal: calculateSubtotal(),
+  minimumOrderValue: MINIMUM_ORDER_VALUE
+});
 
   return;
 }
