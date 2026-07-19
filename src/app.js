@@ -49,7 +49,17 @@ const eventCount = document.querySelector("#event-count");
 const lastEvent = document.querySelector("#last-event");
 const clearDataLayerButton = document.querySelector("#clear-datalayer-btn");
 const dataLayerOutput = document.querySelector("#datalayer-output");
+const productModal = document.querySelector("#product-modal");
+const modalCloseButton = document.querySelector("#modal-close-btn");
+const modalProductImage = document.querySelector("#modal-product-image");
+const modalProductCategory = document.querySelector("#modal-product-category");
+const modalProductName = document.querySelector("#modal-product-name");
+const modalProductPrice = document.querySelector("#modal-product-price");
+const modalProductStock = document.querySelector("#modal-product-stock");
+const modalProductDescription = document.querySelector("#modal-product-description");
+const modalAddToCartButton = document.querySelector("#modal-add-to-cart-btn");
 
+let activeModalProduct = null;
 let selectedDeliverySlot = "";
 console.log("App loaded");
 console.log("Products:", products);
@@ -89,13 +99,23 @@ function renderProducts(productList) {
           ${product.inStock ? "In stock" : "Out of stock"}
         </p>
 
-        <button 
-          class="btn add-to-cart-btn" 
-          data-product-id="${product.id}"
-          ${product.inStock ? "" : "disabled"}
-        >
-          ${product.inStock ? "Add to cart" : "Unavailable"}
-        </button>
+        <div class="product-card-actions">
+  <button 
+    class="btn add-to-cart-btn" 
+    data-product-id="${product.id}"
+    ${product.inStock ? "" : "disabled"}
+  >
+    ${product.inStock ? "Add to cart" : "Unavailable"}
+  </button>
+
+  <button 
+    class="btn details-btn view-details-btn" 
+    data-product-id="${product.id}"
+    type="button"
+  >
+    View details
+  </button>
+</div>
       </div>
     `;
 
@@ -144,6 +164,41 @@ function renderCart() {
   deliveryFee.textContent = formatPrice(calculateDeliveryFee());
   cartTotal.textContent = formatPrice(calculateTotal());
 }
+
+function openProductModal(product) {
+  activeModalProduct = product;
+
+  modalProductImage.src = product.image;
+  modalProductImage.alt = product.name;
+  modalProductCategory.textContent = product.category;
+  modalProductName.textContent = product.name;
+  modalProductPrice.textContent = `${formatPrice(product.price)} / ${product.unit}`;
+
+  modalProductStock.textContent = product.inStock ? "In stock" : "Out of stock";
+  modalProductStock.className = product.inStock
+    ? "stock in-stock"
+    : "stock out-of-stock";
+
+  modalProductDescription.textContent = `${product.name} is available for home delivery from FreshCart Delivery. Add it to your basket and choose a delivery slot at checkout.`;
+
+  modalAddToCartButton.disabled = !product.inStock;
+  modalAddToCartButton.textContent = product.inStock ? "Add to cart" : "Unavailable";
+
+  productModal.classList.remove("hidden");
+
+  runTracking("product_detail_viewed", {
+    productId: product.id,
+    productName: product.name,
+    category: product.category,
+    price: product.price
+  });
+}
+
+function closeProductModal() {
+  productModal.classList.add("hidden");
+  activeModalProduct = null;
+}
+
 
 function renderAnalyticsPanel(lastTrackingResult = null) {
   consentStatus.textContent = analyticsConsentCheckbox.checked ? "granted" : "denied";
@@ -254,6 +309,25 @@ stockOnlyCheckbox.addEventListener("change", () => {
 
 productGrid.addEventListener("click", (event) => {
   const addToCartButton = event.target.closest(".add-to-cart-btn");
+  const viewDetailsButton = event.target.closest(".view-details-btn");
+
+  console.log("Product grid clicked");
+  console.log("Add button:", addToCartButton);
+  console.log("Details button:", viewDetailsButton);
+
+  if (viewDetailsButton) {
+    const productId = Number(viewDetailsButton.dataset.productId);
+    const selectedProduct = products.find((product) => product.id === productId);
+
+    console.log("Selected product for modal:", selectedProduct);
+
+    if (!selectedProduct) {
+      return;
+    }
+
+    openProductModal(selectedProduct);
+    return;
+  }
 
   if (!addToCartButton) {
     return;
@@ -266,17 +340,17 @@ productGrid.addEventListener("click", (event) => {
     return;
   }
 
-addToCart(selectedProduct);
-renderCart();
+  addToCart(selectedProduct);
+  renderCart();
 
-runTracking("add_to_cart", {
-  productId: selectedProduct.id,
-  productName: selectedProduct.name,
-  category: selectedProduct.category,
-  price: selectedProduct.price,
-  unit: selectedProduct.unit,
-  quantity: 1
-});
+  runTracking("add_to_cart", {
+    productId: selectedProduct.id,
+    productName: selectedProduct.name,
+    category: selectedProduct.category,
+    price: selectedProduct.price,
+    unit: selectedProduct.unit,
+    quantity: 1
+  });
 });
 
 cartItemsContainer.addEventListener("click", (event) => {
@@ -427,4 +501,35 @@ renderAnalyticsPanel();
 
 runTracking("product_list_viewed", {
   productCount: products.length
+});
+
+modalCloseButton.addEventListener("click", closeProductModal);
+
+productModal.addEventListener("click", (event) => {
+  const shouldCloseModal = event.target.hasAttribute("data-close-modal");
+
+  if (shouldCloseModal) {
+    closeProductModal();
+  }
+});
+
+modalAddToCartButton.addEventListener("click", () => {
+  if (!activeModalProduct || !activeModalProduct.inStock) {
+    return;
+  }
+
+  addToCart(activeModalProduct);
+  renderCart();
+
+  runTracking("add_to_cart", {
+    productId: activeModalProduct.id,
+    productName: activeModalProduct.name,
+    category: activeModalProduct.category,
+    price: activeModalProduct.price,
+    unit: activeModalProduct.unit,
+    quantity: 1,
+    source: "product_modal"
+  });
+
+  closeProductModal();
 });

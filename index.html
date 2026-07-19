@@ -240,5 +240,34 @@
         </div>
       </section>
     </main>
+
+    <div id="product-modal" class="modal hidden">
+      <div class="modal-backdrop" data-close-modal></div>
+
+      <div class="modal-content">
+        <button id="modal-close-btn" class="modal-close-btn" type="button">
+          ×
+        </button>
+
+        <div class="modal-grid">
+          <div class="modal-image-wrapper">
+            <img id="modal-product-image" src="" alt="" />
+          </div>
+
+          <div>
+            <p id="modal-product-category" class="product-category"></p>
+            <h2 id="modal-product-name"></h2>
+            <p id="modal-product-price" class="product-price"></p>
+            <p id="modal-product-stock" class="stock"></p>
+
+            <p id="modal-product-description" class="modal-description"></p>
+
+            <button id="modal-add-to-cart-btn" class="btn" type="button">
+              Add to cart
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
