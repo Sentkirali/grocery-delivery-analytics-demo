@@ -58,6 +58,7 @@ const modalProductPrice = document.querySelector("#modal-product-price");
 const modalProductStock = document.querySelector("#modal-product-stock");
 const modalProductDescription = document.querySelector("#modal-product-description");
 const modalAddToCartButton = document.querySelector("#modal-add-to-cart-btn");
+const orderConfirmation = document.querySelector("#order-confirmation");
 
 let activeModalProduct = null;
 let selectedDeliverySlot = "";
@@ -163,6 +164,53 @@ function renderCart() {
   cartSubtotal.textContent = formatPrice(calculateSubtotal());
   deliveryFee.textContent = formatPrice(calculateDeliveryFee());
   cartTotal.textContent = formatPrice(calculateTotal());
+}
+
+function getOrderItemCount(items) {
+  return items.reduce((total, item) => {
+    return total + item.quantity;
+  }, 0);
+}
+
+function renderOrderConfirmation(order) {
+  orderConfirmation.classList.remove("hidden");
+
+  orderConfirmation.innerHTML = `
+    <h3>Order confirmed</h3>
+    <p>Your grocery delivery order has been submitted successfully.</p>
+
+    <div class="order-confirmation-grid">
+      <div class="order-confirmation-item">
+        <span>Order ID</span>
+        <strong>${order.id}</strong>
+      </div>
+
+      <div class="order-confirmation-item">
+        <span>Customer</span>
+        <strong>${order.customerName}</strong>
+      </div>
+
+      <div class="order-confirmation-item">
+        <span>Delivery slot</span>
+        <strong>${order.deliverySlot}</strong>
+      </div>
+
+      <div class="order-confirmation-item">
+        <span>Items</span>
+        <strong>${getOrderItemCount(order.items)}</strong>
+      </div>
+
+      <div class="order-confirmation-item">
+        <span>Payment method</span>
+        <strong>${order.paymentMethod.replaceAll("_", " ")}</strong>
+      </div>
+
+      <div class="order-confirmation-item">
+        <span>Total</span>
+        <strong>${formatPrice(order.total)}</strong>
+      </div>
+    </div>
+  `;
 }
 
 function openProductModal(product) {
@@ -437,14 +485,17 @@ checkoutForm.addEventListener("submit", (event) => {
   const validationResult = validateCheckoutForm(formData);
 
   if (!validationResult.isValid) {
-    checkoutMessage.textContent = validationResult.errors.join(" ");
-    checkoutMessage.classList.remove("success");
-    checkoutMessage.classList.add("error");
+  checkoutMessage.textContent = validationResult.errors.join(" ");
+  checkoutMessage.classList.remove("success");
+  checkoutMessage.classList.add("error");
 
-    console.log("Checkout validation failed:", validationResult.errors);
+  orderConfirmation.classList.add("hidden");
+  orderConfirmation.innerHTML = "";
 
-    return;
-  }
+  console.log("Checkout validation failed:", validationResult.errors);
+
+  return;
+}
 
   const order = {
   id: `ORDER-${Date.now()}`,
@@ -468,6 +519,9 @@ checkoutMessage.classList.remove("error");
 checkoutMessage.classList.add("success");
 
 console.log("Order submitted:", order);
+
+renderOrderConfirmation(order);
+
 runTracking("order_submitted", {
   orderId: order.id,
   orderTotal: order.total,
